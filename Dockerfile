@@ -28,7 +28,11 @@ ENV PORT=3000
 
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=builder /app/build ./build
-COPY --from=builder /app/src/lib/server/db ./src/lib/server/db
+# The migrate/seed scripts run standalone via tsx (not through Vite), so they need their
+# full source dependency tree on disk. Copying all of src/ (small TS source, no
+# node_modules) is simpler and safer than hand-picking directories, which has already
+# broken twice from a file importing something one level outside the picked subtree.
+COPY --from=builder /app/src ./src
 COPY package.json ./
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
