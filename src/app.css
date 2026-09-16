@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+
+@theme {
+	--color-brand: #0f172a;
+}
+
+:root {
+	color-scheme: dark;
+}
+
+html,
+body {
+	height: 100%;
+	overscroll-behavior-y: none;
+}
+
+body {
+	@apply bg-slate-950 text-slate-100 antialiased;
+}
