@@ -30,15 +30,17 @@ COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/src/lib/server/db ./src/lib/server/db
 COPY package.json ./
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 RUN useradd --create-home --uid 1001 appuser \
-	&& mkdir -p /app/data \
-	&& chown -R appuser:appuser /app
+	&& chown -R appuser:appuser /app \
+	&& chmod +x /usr/local/bin/docker-entrypoint.sh
 
-USER appuser
 EXPOSE 3000
 
-# Applies pending migrations and (re-)seeds the tag/exercise library, then starts the
-# server. Both are safe to re-run on every boot: the migrator tracks what already ran, and
-# the seed script skips tags/exercises that already exist by name.
+# Entrypoint starts as root (needed to fix ownership of the bind-mounted ./data volume)
+# and then drops to the non-root appuser before running any application code. Migrations
+# and the seed are both safe to re-run on every boot: the migrator tracks what already
+# ran, and the seed script skips tags/exercises that already exist by name.
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["sh", "-c", "node_modules/.bin/tsx src/lib/server/db/migrate.ts && node_modules/.bin/tsx src/lib/server/db/seed/seed.ts && node build/index.js"]
