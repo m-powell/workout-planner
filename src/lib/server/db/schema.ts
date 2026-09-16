@@ -9,7 +9,7 @@ import {
 	type EquipmentCategory,
 	type InjurySeverity,
 	type TagCategory
-} from '$lib/shared/enums';
+} from '../../shared/enums';
 
 export { goalTypeValues, equipmentCategoryValues, injurySeverityValues, tagCategoryValues };
 export type { GoalType, EquipmentCategory, InjurySeverity, TagCategory };
